@@ -1,19 +1,28 @@
 package com.komarzz.LinearRegression;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import com.komarzz.LinearRegression.Data.DataProcessing;
+import com.komarzz.LinearRegression.Data.SplitData;
+import com.komarzz.LinearRegression.Data.Student;
+import com.opencsv.exceptions.CsvException;
+import java.io.IOException;
+import java.util.List;
+
 public class Main {
-    public static void main(String[] args) {
-        // Press Opt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+    public static void main(String[] args) throws IOException, CsvException {
 
-        // Press Ctrl+R or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        List<Student> data;
 
-            // Press Ctrl+D to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Cmd+F8.
-            System.out.println("i = " + i);
-        }
+        DataProcessing processor = new DataProcessing("src/main/java/com/komarzz/LinearRegression/Data" +
+                "/DataSource/Student_Performance.csv");
+
+        data = processor.readDataFromFile();
+
+        SplitData splitData = processor.splitData(data, 0.8);
+
+
+        List<Student> trainingData = splitData.trainingData;
+        List<Student> testData = splitData.testData;
+
+
     }
 }
