@@ -1,14 +1,6 @@
 package com.komarzz.LinearRegression.Data;
 
-import java.util.List;
+import tech.tablesaw.api.Table;
 
-// Класс для хранения разделенных данных
-public class SplitData {
-    public final List<Student> trainingData;
-    public final List<Student> testData;
-
-    public SplitData(List<Student> trainingData, List<Student> testData) {
-        this.trainingData = trainingData;
-        this.testData = testData;
-    }
+public record SplitData(Table trainingData, Table testData) {
 }
