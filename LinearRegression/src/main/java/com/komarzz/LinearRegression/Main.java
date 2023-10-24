@@ -2,26 +2,27 @@ package com.komarzz.LinearRegression;
 
 import com.komarzz.LinearRegression.Data.DataProcessing;
 import com.komarzz.LinearRegression.Data.SplitData;
-import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
+
+
+import static com.komarzz.LinearRegression.Data.DataProcessing.calculateR2;
 
 public class Main {
     public static void main(String[] args) {
         DataProcessing processor = new DataProcessing("src/main/java/com/komarzz/LinearRegression/" +
                 "Data/DataSource/Student_Performance.csv");
 
-        Table normalizedData = processor.getNormalizedData();
+        Table data = processor.getData();
 
-        Table Y = Table.create("Performance Index", normalizedData.column("Performance Index"));
-        Table X = normalizedData.removeColumns("Performance Index");
+        SplitData splitData = DataProcessing.splitData(data, 0.7, 43);
 
-        SplitData YSplit = DataProcessing.splitData(Y, 0.7, 43);
-        SplitData XSplit = DataProcessing.splitData(X, 0.7, 43);
+        Table splitDataTrain = splitData.trainingData();
+        Table splitDataTest = splitData.testData();
 
-        Table YTrain = YSplit.trainingData();
-        Table YTest = YSplit.testData();
-        Table XTrain = XSplit.trainingData();
-        Table XTest = XSplit.testData();
+        Table YTrain = Table.create("Performance Index", splitDataTrain.column("Performance Index"));
+        Table XTrain = splitDataTrain.removeColumns("Performance Index");
+        Table YTest = Table.create("Performance Index", splitDataTest.column("Performance Index"));
+        Table XTest = splitDataTest.removeColumns("Performance Index");
 
         // Обучение линейной регрессии
         LinearRegression lr = new LinearRegression();
@@ -35,25 +36,6 @@ public class Main {
         System.out.println("Коэффициент детерминации R^2: " + r2);
     }
 
-
-
-    public static double calculateR2(Table yTrue, Table yPred) {
-        if (yTrue.rowCount() != yPred.rowCount()) {
-            throw new IllegalArgumentException("The number of rows in yTrue and yPred must be the same.");
-        }
-        DoubleColumn trueColumn = yTrue.doubleColumn(0);
-        DoubleColumn predColumn = yPred.doubleColumn(0);
-        double meanY = trueColumn.mean();
-        double rss = 0;
-        double tss = 0;
-        for (int i = 0; i < trueColumn.size(); i++) {
-            double tY = trueColumn.get(i);
-            double pY = predColumn.get(i);
-            rss += Math.pow(tY - pY, 2);
-            tss += Math.pow(tY - meanY, 2);
-        }
-        return 1 - (rss / tss);
-    }
 
 
 }

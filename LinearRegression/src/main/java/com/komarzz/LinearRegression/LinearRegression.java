@@ -1,6 +1,6 @@
 package com.komarzz.LinearRegression;
 
-import org.ejml.simple.SimpleMatrix;
+import org.apache.commons.math3.linear.*;
 import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
 
@@ -14,37 +14,36 @@ public class LinearRegression {
         int numInstances = XTable.rowCount();
         int numFeatures = XTable.columnCount();
 
-        double[][] X = new double[numInstances][numFeatures+1];
+        double[][] X = new double[numInstances][numFeatures + 1];
         double[] y = new double[numInstances];
 
         for (int i = 0; i < numInstances; i++) {
-            X[i][0] = 1;
+            X[i][0] = 1.0;
         }
 
         for (int i = 0; i < numInstances; i++) {
             for (int j = 0; j < numFeatures; j++) {
-                X[i][j+1] = XTable.doubleColumn(j).get(i);
+                X[i][j + 1] = XTable.doubleColumn(j).get(i);
             }
             y[i] = yTable.doubleColumn(0).get(i);
         }
 
-        System.out.println(Arrays.toString(X[0]));
 
-        SimpleMatrix XMatrix = new SimpleMatrix(X);
-
-        SimpleMatrix yMatrix = new SimpleMatrix(y);
 
         // X^T * X
-        SimpleMatrix XT_X = XMatrix.transpose().mult(XMatrix);
+        double[][] XT = AlgebraUtility.transpose(X);
+        double[][] XT_X = AlgebraUtility.multiply(XT, X);
 
         // X^T * y
-        SimpleMatrix XT_y = XMatrix.transpose().mult(yMatrix);
+        double[] XT_y = AlgebraUtility.operate(XT, y);
+
+        // (X^T * X)^(-1)
+        double[][] inverseXT_X = AlgebraUtility.invert(XT_X);
 
         // (X^T * X)^(-1) * X^T * y
-        SimpleMatrix coefficientsMatrix;
-        coefficientsMatrix = XT_X.invert().mult(XT_y);
+        coefficients = AlgebraUtility.operate(inverseXT_X, XT_y);
 
-        coefficients = coefficientsMatrix.getDDRM().data;
+        System.out.println(Arrays.toString(coefficients));
     }
 
 

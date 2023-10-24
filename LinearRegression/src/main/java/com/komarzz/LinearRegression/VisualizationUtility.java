@@ -4,7 +4,9 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
+import tech.tablesaw.api.DoubleColumn;
 import tech.tablesaw.api.Table;
 
 import javax.swing.*;
@@ -14,6 +16,35 @@ public class VisualizationUtility {
 
 
     private VisualizationUtility(){}
+
+
+    public static void drawChart(Table table) {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (int i = 0; i < table.columnCount(); i++) {
+            if (table.column(i) instanceof DoubleColumn) {
+                DoubleColumn column = (DoubleColumn) table.column(i);
+                for (int j = 0; j < column.size(); j++) {
+                    dataset.addValue(column.get(j), column.name(), Integer.toString(j));
+                }
+            }
+        }
+
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Chart",
+                "Category",
+                "Score",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        chartPanel.setPreferredSize(new Dimension(560, 367));
+        JFrame frame = new JFrame();
+        frame.getContentPane().add(chartPanel);
+        frame.pack();
+        frame.setVisible(true);
+    }
 
     public static void printTable(Table table){
         System.out.println(table.print());

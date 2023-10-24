@@ -49,11 +49,11 @@ public class DataProcessing {
     }
 
     public static SplitData splitData(Table table, double proportion, long randomState){
-        Comparator<Row> randomComparator = (row1, row2) -> {
-            Random random = new Random(randomState);
-            return random.nextInt(3) - 1;  // Возвращает -1, 0, или 1 случайным образом
-        };
-        table.sortOn(randomComparator);
+//        Comparator<Row> randomComparator = (row1, row2) -> {
+//            Random random = new Random(randomState);
+//            return random.nextInt(3) - 1;  // Возвращает -1, 0, или 1 случайным образом
+//        };
+//        table.sortOn(randomComparator);
         Table[] splitData = table.sampleSplit(proportion);
         return new SplitData(splitData[0], splitData[1]);
     }
@@ -78,7 +78,7 @@ public class DataProcessing {
 
         DoubleColumn scaledColumn = DoubleColumn.create(column.name());
         for (double value : column) {
-            scaledColumn.append((value - mean) / stdDev);
+            scaledColumn.append(value/100);
         }
 
         return scaledColumn;
@@ -95,6 +95,24 @@ public class DataProcessing {
         }
 
         return scaledColumn;
+    }
+
+    public static double calculateR2(Table yTrue, Table yPred) {
+        if (yTrue.rowCount() != yPred.rowCount()) {
+            throw new IllegalArgumentException("The number of rows in yTrue and yPred must be the same.");
+        }
+        DoubleColumn trueColumn = yTrue.doubleColumn(0);
+        DoubleColumn predColumn = yPred.doubleColumn(0);
+        double meanY = trueColumn.mean();
+        double rss = 0;
+        double tss = 0;
+        for (int i = 0; i < trueColumn.size(); i++) {
+            double tY = trueColumn.get(i);
+            double pY = predColumn.get(i);
+            rss += Math.pow(tY - pY, 2);
+            tss += Math.pow(tY - meanY, 2);
+        }
+        return 1 - (rss / tss);
     }
 
 
